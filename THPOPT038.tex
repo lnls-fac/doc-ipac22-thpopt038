@@ -1,0 +1,222 @@
+\documentclass[a4paper,
+               %boxit,        % check whether paper is inside correct margins
+               %titlepage,    % separate title page
+               %refpage       % separate references
+               %biblatex,     % biblatex is used
+               keeplastbox,   % flushend option: not to un-indent last line in References
+               %nospread,     % flushend option: do not fill with whitespace to balance columns
+               %hyphens,      % allow \url to hyphenate at "-" (hyphens)
+               %xetex,        % use XeLaTeX to process the file
+               %luatex,       % use LuaLaTeX to process the file
+               ]{jacow}
+%
+% ONLY FOR \footnote in table/tabular
+%
+\usepackage{pdfpages,multirow,ragged2e} %
+%
+% CHANGE SEQUENCE OF GRAPHICS EXTENSION TO BE EMBEDDED
+% ----------------------------------------------------
+% test for XeTeX where the sequence is by default eps-> pdf, jpg, png, pdf, ...
+%    and the JACoW template provides JACpic2v3.eps and JACpic2v3.jpg which
+%    might generates errors, therefore PNG and JPG first
+%
+\makeatletter%
+	\ifboolexpr{bool{xetex}}
+	 {\renewcommand{\Gin@extensions}{.pdf,%
+	                    .png,.jpg,.bmp,.pict,.tif,.psd,.mac,.sga,.tga,.gif,%
+	                    .eps,.ps,%
+	                    }}{}
+\makeatother
+
+% CHECK FOR XeTeX/LuaTeX BEFORE DEFINING AN INPUT ENCODING
+% --------------------------------------------------------
+%   utf8  is default for XeTeX/LuaTeX
+%   utf8  in LaTeX only realises a small portion of codes
+%
+\ifboolexpr{bool{xetex} or bool{luatex}} % test for XeTeX/LuaTeX
+ {}                                      % input encoding is utf8 by default
+ {\usepackage[utf8]{inputenc}}           % switch to utf8
+
+\usepackage[USenglish]{babel}
+\usepackage{caption}
+\usepackage{subcaption}
+
+
+%
+% if BibLaTeX is used
+%
+\ifboolexpr{bool{jacowbiblatex}}%
+ {%
+  \addbibresource{jacow-test.bib}
+  \addbibresource{biblatex-examples.bib}
+ }{}
+\listfiles
+
+%%
+%%   Lengths for the spaces in the title
+%%   \setlength\titleblockstartskip{..}  %before title, default 3pt
+%%   \setlength\titleblockmiddleskip{..} %between title + author, default 1em
+%%   \setlength\titleblockendskip{..}    %afterauthor, default 1em
+
+\begin{document}
+
+\title{SIRIUS Injection Optimization}
+
+\author{X.~R.~Resende\thanks{ximenes.resende@lnls.br}, M.~B.~Alves, , F.~H.~de~Sá, L.~Liu, A.~C.~S.~Oliveira, J.~V.~Quentino \\ Brazilian Synchrotron Light Laboratory (LNLS/CNPEM), Campinas, Brazil}
+	
+\maketitle
+
+%
+\begin{abstract}
+   SIRIUS is the new 3 GeV storage ring (SR)-based 4th generation synchrotron light source built and operated by the Brazilian Synchrotron Light Laboratory (LNLS) located in the CNPEM campus, in Campinas. The foreseeable move to a top-up injection scheme demands improvement of injection efficiency and repeatability levels. In this work we report on the latest efforts in optimizing the SIRIUS injection system.
+\end{abstract}
+
+
+\section{INTRODUCTION}
+
+The SIRIUS injector is comprised of a~\SI{150}{\mega\electronvolt} linac with~\SI{3}{\giga\hertz} RF structures and~\SI{500}{\mega\hertz} sub-harmonic buncher, a full-energy booster (BO) that shares the tunnel with the storage ring (SR) and low and high energy transport lines, LTB and BTS respectively. BO and SR are served by the same RF master frequency generator. See Table \ref{tab:sirius-params} for relevant SIRIUS parameters.
+
+\begin{table}[!hbt]
+   \centering
+   \caption{Relevant SIRIUS Parameters}
+   \begin{tabular}{lcc}
+      \toprule
+      \textbf{Parameter} & \textbf{Value} & \textbf{Units}\\
+       \midrule
+        RF frequency & 499.67 & \SI{}{\mega\hertz} \\ %[3pt]
+        BO harmonic number & 828 & \\
+        SR harmonic number & 864 & \\
+        BO revolution time & 1.657 & \SI{}{\micro\second} \\
+        SR revolution time & 1.729 & \SI{}{\micro\second} \\
+        BO repetition rate & 2 & \SI{}{\hertz} \\
+        BO natural emittance & 3.6 & \SI{}{\nano\meter\radian} \\
+        BO residual coupling & 0.6 & \SI{}{\percent} \\ 
+        EGun multi-bunch charge & 3.0 & \SI{}{\nano\coulomb} \\
+       \bottomrule
+   \end{tabular}
+   \label{tab:sirius-params}
+\end{table}
+
+The SR is currently operating in decay mode, with fill-ups to 100 mA current values twice a day. SIRIUS is planned to move to top-up mode before the completion of SIRIUS Phase-I, scheduled for 2024\cite{liu:IPAC22}. For this new injection scheme to become feasible, accelerator teams have been putting considerable effort in the past year on improving the injection efficiencies at various stages, aiming at reduced required injection times and radiation doses from high energy beam losses.
+
+Low-level RF linac parameters, such as sub-harmonic buncher and klystron phases and amplitudes, have been constantly optimized during the past months, as well as BO injection, ramp and extraction to the SR. In particular, we discuss in the next sections two of the major developments in this direction, both related to the BO: girder realignment and an emittance exchange implemented in the energy ramp. We also describe some of the pending injection issues we are yet to tackle in the next months, before top-up operation. 
+
+\begin{table}[!hbt]
+   \centering
+   \caption{Efficiency for each stage in the injector (\SI{1}{\nano\coulomb}/pulse)}
+   \begin{tabular}{lc}
+      \toprule
+      \textbf{Accelerator} & \textbf{Efficiency [\%]} \\
+       \midrule
+        Linac & $>$ 95 \\ %[3pt]
+        LTB & $>$ 95 \\
+        Booster & $\sim$ 70 \\
+        BTS & $>$ 95 \\
+        SR Injection & $\sim$ 95 \\
+       \bottomrule
+   \end{tabular}
+   \label{tab:inj-eff}
+\end{table}
+
+The current status of SIRIUS injection efficiencies after the improvements described in this work is shown in Table \ref{tab:inj-eff}. The overall efficiency is around 60\% and most of the losses happen in low energies, at the booster injection. For higher electron gun (EGun) charges the efficiency can drop, as discussed below, but the injector still can provide \SI{1}{\nano\coulomb}/pulse to the SR, a conservative charge value for the envisaged top-up scheme.
+
+\section{BOOSTER REALIGNMENT}
+
+In the beginning of 2022, a major BO realignment was performed for a better match between the on-energy revolution time of the BO at low energies and the corresponding value in the SR, since both accelerators share RF frequency. All BO girders were moved inwards by~\SI{158}{\micro\meter}, corresponding to a reduction of~\SI{1}{\milli\meter} in circumference. This realignment was requested in order to reduce the off-energy orbit of the injected beam at low energy at the BO. Before the realignment, the off-energy orbit was estimated to be~\SI{-0.88}{\milli\meter}, according to BPM-averaged orbit readouts. After realignment this average was reduced to~\SI{-0.34}{\milli\meter} (Fig. \ref{fig:bo-offenergy}). As dispersion function at BPMs is~\SI{22}{\centi\meter}, these horizontal position averages corresponds to~\SI{-0.40}{\percent} and~\SI{-0.15}{\percent} off-energy errors, respectively.
+\begin{figure}[!htb]
+   \centering
+   \includegraphics*[width=.9\columnwidth]{THPOPT038_f1.pdf}
+   \caption{Effect of booster realignment on the average horizontal position. BPM acquisition at 1 kHz.}
+   \label{fig:bo-offenergy}
+\end{figure}
+
+Apart from reducing the off-energy error, the entire booster ramp was also optimized, mainly by measuring and correcting beam orbit and betatron tunes along the ramp to nominal values. Realignment improved mainly the beam capture in the BO, thus increasing the overall booster ramp efficiency, presently optimized to~\SI{70}{\percent}, from about its previous~\SI{20}{\percent}.  (Fig.\ref{fig:bo-ramp}).
+\begin{figure}[!htb]
+   \centering
+   \includegraphics*[width=.9\columnwidth]{THPOPT038_f2.pdf}
+   \caption{Improvement on booster capture efficiency after realignment and ramp optimizations of Jan/2022, using BPM TbT sum signal as proxy to beam current TbT evolution. Injected charge is~\SI{0.2}{\nano\coulomb}, typical in user shift injections.}
+   \label{fig:bo-ramp}
+\end{figure}
+
+
+\section{EMITTANCE EXCHANGE}
+
+The other important injection optimization was the transverse emittance exchange (TEE) implemented in the booster ramp. Currently the non-linear dynamics in SIRIUS is not yet optimized, chromatic sextupole strengths are still set to nominal design values. As a consequence, the measured dynamic aperture corresponds to a horizontal aperture of~\SI{-8.5}{\milli\meter}, somewhat smaller than the expected value of~\SI{-9.5}{\milli\meter} from design. During commissioning the position found that optimized off-axis injection with the non-linear kicker (NLK) was around ~\SI{0.5}{\milli\meter} away from design value. Even for the low emittance SIRIUS booster, at injection point beam positions whose distance to the NLK flat-top condition differ even a small fraction of a mm from the design value will lead to kick spreads that reduce the injection efficiency into the SR. The smaller horizontal injected beam size of TEE in the booster helps improving injection in SR with reduced dynamical aperture by minimizing the kick spread from the NLK. Details of TEE implementation can be found here\cite{quentino:IPAC22}.
+
+The emittance exchange is accomplished via a transverse-tune crossing resonance implemented in the booster quadrupoles ramp approximately 1 ms before the extraction instant. Fig.\ref{fig:tee-sigmas} shows measured beam sizes along the emittance exchange process.
+\begin{figure}[!htb]
+   \centering
+   \includegraphics*[width=.9\columnwidth]{THPOPT038_f3.png}
+   \caption{Fitted beam sizes at one YAG screen of the BTS for different stages in the TEE.}
+   \label{fig:tee-sigmas}
+\end{figure}
+
+Fig. \ref{fig:tee-screens} shows an example of the CCD beam image recorded from the first YAG screen in the BTS, right after beam extraction from booster. It corresponds to two instants in the process: one where the beam was extracted before TEE could have set in (first point at $\sim$ -3 ms in Fig. \ref{fig:tee-sigmas}) and another when the beam is extracted when exchange is optimal (data point at $\sim$0.5 ms in Fig. \ref{fig:tee-sigmas}).
+\begin{figure}[!htb]
+   \centering
+   \begin{subfigure}[b]{0.22\textwidth}
+         \centering
+         \includegraphics*[width=\columnwidth]{THPOPT038_f4a.png}
+         \caption{without TEE}
+         \label{fig:tee-screens-a}
+   \end{subfigure}
+   \begin{subfigure}[b]{0.22\textwidth}
+         \centering
+         \includegraphics*[width=\columnwidth]{THPOPT038_f4b.png}
+         \caption{with TEE}
+         \label{fig:tee-screens-b}
+   \end{subfigure}
+   \caption{YAG screen beam images in the entrance of BTS, right after BO extraction.}
+   \label{fig:tee-screens}
+\end{figure}
+
+The TEE implemented in March 2022 has been able to increase injection efficiency on optimal SR conditions by around 10\%. But TEE is still an on-going development: preliminary observations indicate that it also has a positive impact on injection efficiency fluctuations due to jitters and drifts of the pulse electronics and magnets, but its full characterization is lacking.
+
+\section{PENDING ISSUES}
+The main identified injector issues still pending are connected to the non-repeatability of the booster to storage ring injection conditions, reducing the injection efficiency over time. In the subsections below these issues will be described.
+
+\subsection{Septa Temperatures Variations}
+When the injection system is turned on there is a fast temperature increase of up to~\SI{60}{\degreeCelsius} within 1-2 minutes for the SR injection septa. During this time there would be large injected beam losses if the injector were to be turned on. At injection, the Linac EGun is usually pulsed a few minutes after the pulsed magnets, giving time for the septa to overcome this fast temperature rise. After a few minutes of pulsing the septa, the magnets enter a new regime where there are slow, but seemingly non-negligible, variations of their temperatures over a much longer period. Injection at user's shifts happen during this regime and SR efficiency changes as septa temperatures reach higher values, as can be seen in Fig.\ref{fig:septa-temperatures}.
+\begin{figure}[!htb]
+   \centering
+   \includegraphics*[width=.99\columnwidth]{THPOPT038_f5.pdf}
+   \caption{A full 100 mA injection showing correlation of SR injection efficiency with septa temperature variations (several sensors at BO extraction septa EjeSep and SR injection septa InjSep). As temperatures increase, reaching the condition optimized in machine studies, the efficiency tends to increase along.}
+   \label{fig:septa-temperatures}
+\end{figure}
+
+Usually parameters such as injected beam position and angle at injection point (which include septa magnets as knobs) are weekly optimized during machine studies to accommodate electronics and other unknown drift sources. At machine studies the injection system is run for long periods of time while improvements are performed. It is at this "warmed-up" regime that injection is optimized. But in user's shift the operators can not wait for septa to reach optimum temperatures and then efficiency is compromised. During commissioning in previous years this temperature-dependence had been observed and partially mitigated with improvised air-cooling setup on septa magnets. Further mitigation alternatives are being studied such as temperature to position and angle feed-forward tables and water-cooled septa coils.
+
+\subsection{Booster Ramp "Drops" and "Flips"}
+
+Another issue are quasi-periodic drops in the SR injection, which can reach values as low as ~\SI{20}{\percent}. These drops happen with a quasi-periodicity of approximately 6 pulses, or \SI{3}{\second}. This issue was not investigated yet but a natural suspect is synchronization slippages between different BO power supply (PS) types that can introduce tracking errors in the energy ramp. Currently, power supplies are synchronized only at the start of each BO cycle, not at every setpoint along the ramp, and within a pulse-width modulation (PWM) period. Since each PS type runs on different PWM clocks the quasi-periodicity may be related to a frequency beating of these clocks. Orbit signatures from BPM TbT acquisitions, both from the BO and from the SR, may provide clues to possible power supplies culprits. This effect can clearly be observed in Fig.\ref{fig:septa-temperatures}.
+
+There is yet another issue with the BO that needs addressing: sometimes the BO ramp seems to change, flipping between two possible states. When this flipping happens it usually stays in that state for weeks, or sometimes months. Before BO realignment these events had a considerable deterioration of the ramp efficiency, if they were not corrected. A flip in the booster ramp state induces a change of approximately \SI{2}{\milli\meter} in the average of vertical orbit distortion at low energies, whose correction restores the ramp efficiency. Two ramp configurations are then needed to be stored, one for each flip ramp state. They are both updated whenever an unrelated optimization is implemented in the accelerators. The source of these sudden flips between two ramp settings is still unknown and under investigation.
+
+\subsection{Charge effects in Booster Ramp}
+
+A final issue to be reported here is the influence of the incoming beam charge on the BO injection efficiency. When the linac beam charge per pulse is increased by reducing the EGun bias voltage then BO injection efficiency systematically drops. This drop is larger the higher beam charge. Daily injection is usually done with 0.2-\SI{0.5}{\nano\coulomb}/pulse for which this effect is still small. See Fig.~\ref{fig:bo-inj-impedance} for measurements.
+
+\begin{figure}[!htb]
+   \centering
+   \includegraphics*[width=.9\columnwidth]{THPOPT038_f6.pdf}
+   \caption{Booster injection efficiency as a function of injected beam charge. The efficiency is calculated with the beam at low energy, from the first 2000 TbT BPM sum signal data, averaged over 5 acquisitions for each beam charge.}
+   \label{fig:bo-inj-impedance}
+\end{figure}
+
+% \vspace{-0.5cm}
+\section{CONCLUSIONS}
+
+Linac low-level RF adjustments, Booster realignment, orbit and tune optimizations in the energy ramp and emittance exchange at the booster were essential for increasing the overall injection efficiency from linac to the SR from below~\SI{20}{\percent} to above~\SI{60}{\percent} in 2022. Nowadays the injector system allows for top-up operation with parameters designed. Notwithstanding these improvements, many of the issues described above are still pending and their solutions can further benefit the injector quality. They should be tackled as soon as possible in order to provide a cleaner injection from the point of view of radiation doses with less losses and fewer injection pulses at current fill-ups in top-up mode.
+
+\begin{thebibliography}{2} % Use for 1-9 references
+	
+\bibitem{liu:IPAC22}
+L. Liu et al., \textquotedblleft{Status of SIRIUS Operation}\textquotedblright, presented at the 13th International Particle Accelerator Conf. (IPAC’22), Bangkok, Thailand, Jun. 2022, paper TUPOMS002, this conference.
+  
+\bibitem{quentino:IPAC22}
+J.V. Quentino et al., \textquotedblleft{Emittance Exchange at SIRIUS Booster for Storage Ring Injection Improvement}\textquotedblright, presented at the 13th International Particle Accelerator Conf. (IPAC’22), Bangkok, Thailand, Jun. 2022, paper THPOPT056, this conference.
+  
+\end{thebibliography}
+
+
+\end{document}
